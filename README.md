@@ -1,7 +1,7 @@
 # 漢のハッカソン Project
 
 ## プロジェクト概要
-このプロジェクトは、地震や洪水などの自然災害に関するハザード情報を管理するバックエンドシステムです。TypeORMを使用してデータベースとやり取りし、PostGISを利用して地理空間情報を扱います。
+このプロジェクトは、リアルタイム情報をマップ上に表示する機能を持ちます。
 
 ## 依存関係
 - node :
@@ -11,10 +11,6 @@
 - PostgreSQL:
   - postgres --version
     14.16
-
-## PostGIS 拡張機能を有効化
-  - postgis
-  - postgis_topology
 
 ## インストール手順（Mac）
 
@@ -44,66 +40,89 @@ postgres --version
 ```bash
 brew services start postgresql
 ```
-
-4. データベースを作成します。
+4. PostgreSQLにログインします。
 ```bash
-createdb your_database_name
+psql postgres
 ```
-
-### PostGIS
-1. PostGIS拡張機能をインストールします。
+5. 新しいユーザーを作成します
 ```bash
-brew install postgis
+CREATE USER your_username WITH PASSWORD 'your_password';
 ```
-
-2. データベースにPostGIS拡張機能を追加します。
-```sql
-CREATE EXTENSION postgis;
-CREATE EXTENSION postgis_topology;
+6. データベースを作成します
+```bash
+createdb your_database_name //好きな名前
 ```
-
+7. データベースを作成し、ユーザーに権限を付与します
+```bash
+CREATE DATABASE your_database_name;
+GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_username;
+```
 ## 環境変数
 `.env`ファイルに以下の環境変数を設定します。
 ```
-/Users/nobutokai/Documents/projects/Hakson/backend/.env.sampleを参照
+backend/.env.sampleを参照
 
 ```
 
-## マイグレーションの実行
-src/config/data-source.tsの設定を変更し、プロジェクトの起動でテーブルが自動生成される。
+## Prisuma実行
+1. Prisma CLIとPrisma Clientをインストールします。
 ```bash
-npm run dev
+npm install prisma --save-dev
+npm install @prisma/client
 ```
-## DBデータの追加
-src/db/dataScript.zshを使用
-- 対象データによってコメントアウトの設定をお願いします
+<!-- 2. Prismaを初期化します。
+```bash
+npx prisma init
+``` -->
+3. Prismaのマイグレーションを実行してデータベーススキーマを作成します。
+```bash
+
+npx prisma db push
+npx prisma generate
+```
+4. DBデータの追加
+```bash
+npx ts-node prisma/seed.ts
+```
+
 
 ## プロジェクトの起動
 以下のコマンドでプロジェクトを起動します。
 ```bash
 npm run dev
 ```
+※imap（Gmail）の設定をしていない場合は、server.tsの```startEmailListener();```をコメントアウトしてください。
 
 ## ディレクトリ構成
 ```
 /backend
-├── src/
-│   ├── config/         # データベース接続などの設定ファイル
-│   ├── controllers/    # リクエストハンドリングとルーティング
-│   ├── models/
-│   │   ├── dto/       # データ転送オブジェクト
-│   │   └── entity/    # データベースエンティティ
-│   ├── services/      # ビジネスロジック
-│   └── utils/         # ユーティリティ関数
-├── .env               # 環境変数設定
-├── .env.sample       # 環境変数のサンプル
-└── README.md         # プロジェクトドキュメント
+├── prisma
+│   ├── schema.prisma　テーブル定義
+│   ├── seed.ts //テストデータ
+├── src
+│   ├── models　//タイプスクリプトの型を定義
+│   │   ├── CommonResponseModel.ts　
+│   ├── middlewares　
+│   │   ├── emailReceiver.ts
+│   ├── server.ts
+│   ├── app.ts
+├── .env
+├── package.json
+└── README.md
 ```
 
-## 主な機能
+
+## xのAPIリファレンス
+https://docs.x.com/x-api/posts/full-archive-search
 
 
+## OpenStreetMap
+src/middlewares/geocoding.ts
+町目までしか検索できない。
 
+## google
+以下を設定
+GOOGLE_MAPS_API_KEY=
 
 # 外部API
 GoogleMapsAPI

@@ -7,80 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model FloodHazardZones {
-  id          Int                     @id @default(autoincrement())
-  hazard_type Int
-  a31_101     String?
-  a31_102     String?
-  a31_103     Int?
-  a31_104     String?
-  a31_105     Int?
-  a31_106     String?
-  a31_107     String?
-  a31_108     String?
-  a31_201     String?
-  a31_202     String?
-  a31_203     Int?
-  a31_204     String?
-  a31_205     Int?
-  a31_206     String?
-  a31_207     String?
-  a31_301     String?
-  a31_302     String?
-  a31_303     Int?
-  a31_304     String?
-  a31_305     Int?
-  a31_306     String?
-  a31_307     String?
-  a31_308     String?
-  a31_401     String?
-  a31_402     String?
-  a31_403     Int?
-  a31_404     String?
-  a31_405     Int?
-  a31_406     String?
-  a31_407     String?
-  a31_408     String?
-  geometry    Unsupported("geometry")
-
-  @@map("flood_hazard_zones")
+model Email {
+  id           Int      @id @default(autoincrement())
+  from         String
+  subject      String
+  body         String
+  disasterType String
+  receivedAt   DateTime @default(now())
+  address      String   @default("住所不明")
+  latitude     Float? 
+  longitude    Float? 
+  createdAt    DateTime @map("created_at")
 }
 
-model LandslideZones {
-  id       Int                      @id @default(autoincrement())
-  a33_001  String?                  @db.VarChar
-  a33_002  String?                  @db.VarChar
-  a33_003  String?                  @db.VarChar
-  a33_004  String?                  @db.VarChar
-  a33_005  String?                  @db.VarChar
-  a33_006  String?                  @db.VarChar
-  a33_007  String?                  @db.VarChar
-  a33_008  String?                  @db.VarChar
-  geometry Unsupported("geometry")?
-
-  @@index([geometry], map: "landslide_zones_geometry_geom_idx", type: Gist)
-  @@map("landslide_zones")
+model Tweet {
+  id            String  @id @unique // ツイートID
+  text          String  // ツイートの本文
+  createdAt     DateTime @map("created_at") // ツイートの作成日時
+  authorId      String?   // ツイートの投稿者ID
+  authorName    String  // 投稿者のユーザー名
+  authorProfile String? // 投稿者のプロフィール画像URL
+  mediaUrl      String? // 画像や動画のURL（メディアなしの場合はnull）
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model SpatialRefSys {
-  srid      Int     @id
-  auth_name String? @db.VarChar(256)
-  auth_srid Int?
-  srtext    String? @db.VarChar(2048)
-  proj4text String? @db.VarChar(2048)
+model News {
+  id          Int     @id @default(autoincrement()) // 自動インクリメントのID
+  title       String  @db.Text
+  description String  @db.Text
+  content     String  @db.Text
+  url         String  @unique // ニュースのURL（重複防止）
+  image       String? // 記事の画像URL（任意）
+  publishedAt DateTime
+  createdAt   DateTime @default(now())
 
-  @@map("spatial_ref_sys")
-}
+  sourceName  String  // ニュースの発信元
+  sourceUrl   String  // 発信元のURL
 
-model TsunamiHazardZones {
-  gid     Int                      @id @default(autoincrement())
-  a40_001 String?                  @db.VarChar(10)
-  a40_002 String?                  @db.VarChar(2)
-  a40_003 String?                  @db.VarChar(40)
-  geom    Unsupported("geometry")?
+  latitude    String? // 緯度（null 許容）
+  longitude   String? // 経度（null 許容）
+  formattedAddress String? //住所取得
 
-  @@index([geom], type: Gist)
-  @@map("tsunami_hazard_zones")
+  category    String  // ジャンル（殺人・窃盗・詐欺・事故・火災・その他）
+  summary     String  // キャッチコピーの要約
 }
