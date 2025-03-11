@@ -105,3 +105,9 @@ npm run dev
 
 
 
+# 外部API
+GoogleMapsAPI
+GeminiAPI
+XAPI
+GNEWSAPI
+IMAP
