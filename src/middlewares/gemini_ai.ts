@@ -58,7 +58,7 @@ export async function extractLocation(text: string): Promise<{ extractedLocation
         return { extractedLocation };
 
     } catch (error) {
-        console.error('❌ APIエラー:', error instanceof Error ? error.message : error);
+        console.error('APIエラー:', error instanceof Error ? error.message : error);
         throw new Error('位置情報の取得に失敗しました');
     }
 }
@@ -116,7 +116,7 @@ export async function generateSummary(text: string): Promise<string> {
         return parsedSummary.summary;
 
     } catch (error) {
-        console.error('❌ APIエラー:', error instanceof Error ? error.message : error);
+        console.error('APIエラー:', error instanceof Error ? error.message : error);
         throw new Error('要約キャッチコピーの生成に失敗しました');
     }
 }

@@ -1,8 +1,8 @@
 import Imap from "imap";
 import { simpleParser } from "mailparser";
-import { geocodeAddress } from "./geocoding";
 import { prisma } from "../config/prisma";
 import IMAP_CONFIG from "../config/imap";
+import { geocodeAddressWithGoogle } from "./google-geocoding";
 
 
 
@@ -75,7 +75,7 @@ async function fetchEmails() {
           const disasterType = parseDisasterType(parsed.text || ""); // 災害の種別を抽出
           const firstLine = parseFirstLine(parsed.text || ""); // 最初の一行目を抽出
           const address = parseAddress(parsed.text || ""); // 住所を抽出
-          const coordinates = await geocodeAddress(simplifyAddress(address));
+          const coordinates = await geocodeAddressWithGoogle(simplifyAddress(address));
           // DBに保存
           await prisma.email.create({
             data: {

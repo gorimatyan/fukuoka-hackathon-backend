@@ -1,5 +1,5 @@
 /**
- * Tweetを表す型
+ * Tweetのレスポンスモデル
  */
 export interface TweetResponse {
     id: string;
@@ -10,6 +10,8 @@ export interface TweetResponse {
     authorProfile?: string | null;
     mediaUrl?: string | null;
     tweetUrl?: string | null;
+    isRateLimited?: boolean; // API制限時に true
+    retryAfter?: number;// 429発生時のリトライ推奨秒数
 }
 
 /**
