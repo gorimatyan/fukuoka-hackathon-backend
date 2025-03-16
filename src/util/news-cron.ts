@@ -1,24 +1,29 @@
 import cron from "node-cron";
-import { fetchNews } from "../middlewares/gnews";
+// import { fetchNews } from "../middlewares/gnews";
 import { News, NewsResponse } from "../models/NewsModel";
 import { extractLocation, generateSummary, classifyNews } from "../middlewares/gemini_ai";
 import { geocodeAddressWithGoogle } from "../middlewares/google-geocoding";
 import { saveToDatabase } from "../middlewares/saveToDatabase"; 
-
-
+import { fetchNews } from "../middlewares/fetch-news";
 
 // 📌 毎時0分にニュースを取得・処理（1時間ごとに実行）
 export async function processGoutouNews() {
     console.log("⏰ ニュース取得（1時間ごと）開始...");
 
-    const searchKeywords = ["福岡", "強盗"];
+    const searchKeywords = ["福岡","強盗"];
     const searchPeriodInDays = 7;
 
     try {
         // ニュースを取得
         const newsList: News[] = await fetchNews(searchKeywords, searchPeriodInDays);
 
-        for (const newsItem of newsList) {
+        console.log("📰 ニュース記事リスト:", newsList);
+
+        // ニュース記事を1件ずつ処理
+        for (const [index, newsItem] of newsList.entries()) {
+            if(process.env.NODE_ENV === 'local' && index > 0) {
+                return;
+            }
             try {
                 console.log(`🔍 ニュース処理中: ${newsItem.title}`);
 

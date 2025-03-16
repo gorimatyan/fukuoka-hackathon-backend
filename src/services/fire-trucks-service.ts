@@ -12,15 +12,17 @@ import { convertFireDataToMapAnnotationData } from "../util/convertToMapAnnotati
 export class FireTrucksService {
     /**
      * @method getFireTrucks
-     * @description 過去2時間以内に受信したメールを取得します。
+     * @description 過去24時間以内に受信したメールを取得します。
      * @returns {Promise<Array>} 火災に関するメールの配列を返します。
      */
     async getFireTrucks(): Promise<MapAnnotationData[]> {
-        const oneHourAgo = new Date(Date.now() - 1 * 60 * 60 * 1000);
+        // const oneHourAgo = new Date(Date.now() - 1 * 60 * 60 * 1000);
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
         const data = await prisma.email.findMany({
             where: {
                 receivedAt: {
-                    gte: oneHourAgo,
+                    gte: oneDayAgo,
                 },
             },
         });
