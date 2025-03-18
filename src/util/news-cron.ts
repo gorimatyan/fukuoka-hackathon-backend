@@ -18,7 +18,13 @@ export async function processGoutouNews() {
         // ニュースを取得
         const newsList: News[] = await fetchNews(searchKeywords, searchPeriodInDays);
 
-        for (const newsItem of newsList) {
+        console.log("📰 ニュース記事リスト:", newsList);
+
+        // ニュース記事を1件ずつ処理
+        for (const [index, newsItem] of newsList.entries()) {
+            if(process.env.NODE_ENV === 'development' && index > 0) {
+                return;
+            }
             try {
                 console.log(`🔍 ニュース処理中: ${newsItem.title}`);
 
