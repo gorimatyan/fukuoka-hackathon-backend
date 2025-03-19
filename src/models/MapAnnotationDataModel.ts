@@ -9,7 +9,8 @@ export type MapAnnotationData = {
   sourceUrl: string|null // 発信元のURL
   clusteringIdentifier: string
   data: {
-    area: string
+    address: string|null
+    predictedLocation: string|null
     link: string
   }
   markerImgUrl?: string // マーカーの画像

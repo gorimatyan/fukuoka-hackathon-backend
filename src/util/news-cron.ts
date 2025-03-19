@@ -1,9 +1,9 @@
 import cron from "node-cron";
-import { fetchNews } from "../middlewares/gnews";
 import { News, NewsResponse } from "../models/NewsModel";
 import { extractLocation, generateSummary, classifyNews } from "../middlewares/gemini_ai";
 import { geocodeAddressWithGoogle } from "../middlewares/google-geocoding";
 import { saveToDatabase } from "../middlewares/saveToDatabase"; 
+import { fetchNews } from "../middlewares/fetch-news";
 
 
 
@@ -30,7 +30,7 @@ export async function processGoutouNews() {
 
                 const locationDataRaw: { extractedLocation: string; } = await extractLocation(newsItem.content);
 
-                console.log("📍 取得した住所データ:", locationDataRaw);
+                console.log("📍 取得した住所データ:", locationDataRaw); // { extractedLocation: '福岡市中央区輝国 ヒルトップリゾート福岡' }
 
                 let latitude: string | null = null;
                 let longitude: string | null = null;
@@ -45,7 +45,8 @@ export async function processGoutouNews() {
                         const geoData = await geocodeAddressWithGoogle(extractedAddress);
                         latitude = geoData?.latitude ? geoData.latitude.toString() : null;
                         longitude = geoData?.longitude ? geoData.longitude.toString() : null;
-                        formattedAddress = geoData?.formattedAddress ?? null;
+                        formattedAddress = geoData?.formattedAddress ?? null; // formatted_address: '日本、〒810-0032 福岡県福岡市中央区輝国１丁目１−３３',
+                        console.log("🌍 Google Geocoding の結果:", geoData);
                     } catch (geoError) {
                         console.warn(`⚠️ 住所の緯度経度取得に失敗: ${extractedAddress}`);
                     }
@@ -72,9 +73,10 @@ export async function processGoutouNews() {
                         name: newsItem.source.name,
                         url: newsItem.source.url
                     },
-                    latitude: latitude ?? '',
-                    longitude: longitude ?? '',
-                    formattedAddress: formattedAddress ?? '',
+                    latitude: latitude ?? "",
+                    longitude: longitude ?? "",
+                    formattedAddress: formattedAddress ?? "",
+                    predictedLocation: extractedAddress ?? "",
                     category: category,
                     summary: summary
                 };
@@ -153,6 +155,7 @@ export async function processSatujinNews() {
                     latitude: latitude ?? '',
                     longitude: longitude ?? '',
                     formattedAddress: formattedAddress ?? '',
+                        predictedLocation: extractedAddress ?? '',
                     category: category,
                     summary: summary
                 };
@@ -231,6 +234,7 @@ export async function processJikoNews() {
                     latitude: latitude ?? '',
                     longitude: longitude ?? '',
                     formattedAddress: formattedAddress ?? '',
+                    predictedLocation: extractedAddress ?? '',
                     category: category,
                     summary: summary
                 };

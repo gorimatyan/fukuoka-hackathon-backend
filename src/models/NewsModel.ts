@@ -32,6 +32,7 @@ export interface NewsResponse {
     latitude: string;
     longitude: string;
     formattedAddress: string;
+    predictedLocation: string;
     category: string;
     summary: string;
 }
