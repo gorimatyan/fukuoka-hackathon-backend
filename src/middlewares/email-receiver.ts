@@ -71,10 +71,13 @@ async function fetchEmails() {
         try {
           const parsed = await simpleParser(emailBody);
           console.log("📜 メール受信:", parsed.subject, parsed.from?.text);
-
+          console.log("📜 メール本文:", parsed.text);
+          
           const disasterType = parseDisasterType(parsed.text || ""); // 災害の種別を抽出
           const firstLine = parseFirstLine(parsed.text || ""); // 最初の一行目を抽出
           const address = parseAddress(parsed.text || ""); // 住所を抽出
+          console.log("🔍抽出した住所:", address);
+          console.log("🔍整形した住所:", simplifyAddress(address));
           const coordinates = await geocodeAddressWithGoogle(simplifyAddress(address));
           // DBに保存
           await prisma.email.create({
@@ -129,11 +132,16 @@ function parseFirstLine(message: string): string {
 
 /**
  * メール本文から住所を抽出する
+ * 「付近」という文字列の前の文字列を住所として抽出
+ * 例：
+ *  - "久山町　大字山田２１０番付近"       → "久山町大字山田２１０番"
+ *  - "筑紫野市永岡５０３番付近"           → "筑紫野市永岡５０３番"
+ *  - "春日市  春日公園　４丁目　２番付近" → "春日市春日公園４丁目２番"
  */
 function parseAddress(message: string): string {
-  const addressPattern = /(\S+区\s+\S+?(\d+丁目(\d+番)?)?付近?)/;
-  const match = message.match(addressPattern);
-  return match ? match[0] : "住所不明";
+  const addressPattern = /(.+)付近/;
+  const match = message.replace(/[\s　]+/g, '').match(addressPattern);
+  return match ? match[1] : "住所不明";
 }
 
 /**

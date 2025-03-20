@@ -20,7 +20,8 @@ export function convertFireDataToMapAnnotationData(d: any): MapAnnotationData {
         sourceUrl: null,
         clusteringIdentifier: d.disasterType ?? "未分類",
         data: {
-            area: d.address ?? "住所不明",
+            address: d.address ?? null,
+            predictedLocation: d.predictedLocation ?? null,
             link: "",
         },
         markerImgUrl: "",
@@ -49,7 +50,8 @@ export function convertNewsToMapAnnotationData(n: any): MapAnnotationData {
         sourceUrl: n.sourceUrl || "",
         clusteringIdentifier: n.category,
         data: {
-            area: n.formattedAddress || "不明",
+            address: n.formattedAddress || null,
+            predictedLocation: n.predictedLocation || null,
             link: n.url,
         },
         markerImgUrl: n.image || "",

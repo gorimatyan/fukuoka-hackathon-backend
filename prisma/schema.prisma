@@ -46,6 +46,7 @@ model News {
   latitude    String? // 緯度（null 許容）
   longitude   String? // 経度（null 許容）
   formattedAddress String? //住所取得
+  predictedLocation String? // AIが推測した場所の住所
 
   category    String  // ジャンル（殺人・窃盗・詐欺・事故・火災・その他）
   summary     String  // キャッチコピーの要約

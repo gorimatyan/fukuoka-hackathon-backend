@@ -23,6 +23,7 @@ export async function saveToDatabase(newsData: NewsResponse): Promise<void> {
                 latitude: newsData.latitude,
                 longitude: newsData.longitude,
                 formattedAddress: newsData.formattedAddress,
+                predictedLocation: newsData.predictedLocation,
                 category: newsData.category,
                 summary: newsData.summary
             },
@@ -39,6 +40,7 @@ export async function saveToDatabase(newsData: NewsResponse): Promise<void> {
                 latitude: newsData.latitude,
                 longitude: newsData.longitude,
                 formattedAddress: newsData.formattedAddress,
+                predictedLocation: newsData.predictedLocation,
                 category: newsData.category,
                 summary: newsData.summary
             }
