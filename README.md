@@ -12,6 +12,22 @@
   - postgres --version
     14.16
 
+## Dockerでの環境構築 20250321追記
+### 開発環境
+
+```bash
+docker-compose up --build  # アプリケーションの起動
+```
+
+```bash
+docker-compose exec app npx prisma studio --host 0.0.0.0  # 必要に応じてPrisma Studioを起動
+```
+
+### 本番環境（Cloud Run）
+```bash
+docker build -t gcr.io/[PROJECT-ID]/[IMAGE-NAME] .  # 本番用イメージのビルド
+```
+
 ## インストール手順（Mac）
 
 ### Node.js

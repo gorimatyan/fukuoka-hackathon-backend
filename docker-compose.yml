@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # アプリケーションサービスの定義
+  app:
+    # 開発環境用のDockerfileを使用してビルド
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # ポートマッピング
+    ports:
+      - "3001:3001"  # メインアプリケーション用ポート
+      - "5555:5555"  # 開発環境でのPrisma Studio用ポート
+    # ボリュームマウント
+    volumes:
+      - .:/app  # ソースコードの変更をコンテナに即時反映
+      - /app/node_modules  # node_modulesは独立したボリュームとして管理
+    # 環境変数の設定
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db  # localhostからdbに変更
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASS=${DB_PASSWORD:-password}
+      - DB_NAME=${DB_NAME:-fukuoka_hackathon_backend}
+      # Prisma用のデータベースURL - ホスト名をdbに変更
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-fukuoka_hackathon_backend}
+    # データベースサービスへの依存関係
+    depends_on:
+      db:
+        condition: service_healthy
+    # 開発環境起動時のコマンド
+    # マイグレーションを実行してからアプリケーションを起動
+    command: sh -c "npx prisma migrate deploy && npm run dev"
+
+  # データベースサービスの定義
+  db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+      - POSTGRES_DB=${DB_NAME:-fukuoka_hackathon_backend}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # データベースの健全性チェック
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+# 永続化ボリュームの定義
+volumes:
+  postgres_data:  # PostgreSQLデータの永続化用ボリューム

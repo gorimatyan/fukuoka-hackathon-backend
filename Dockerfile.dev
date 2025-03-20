@@ -1,0 +1,56 @@
+# ベースイメージとしてNode.js 20のスリム版を使用
+# スリム版を選択することでイメージサイズを最小限に抑えつつ、必要な機能を確保
+FROM node:20-slim
+
+# Puppeteerで必要となる依存関係をインストール
+# Chrome、フォント、その他必要なライブラリをインストールする
+# 日本語フォント(fonts-ipafont-gothic)や中国語フォント(fonts-wqy-zenhei)なども含む
+# --no-install-recommendsオプションで推奨パッケージのインストールを防ぎ、イメージサイズを削減
+# Puppeteer用の依存関係をインストール
+RUN apt-get update \
+    && apt-get install -y \
+    chromium \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-thai-tlwg \
+    fonts-kacst \
+    fonts-freefont-ttf \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# Puppeteerの設定
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# アプリケーションの作業ディレクトリを設定
+# /appディレクトリを作成し、以降のコマンドはここで実行される
+WORKDIR /app
+
+# パッケージ依存関係ファイルをコピー
+# package.jsonとpackage-lock.jsonのみを先にコピーすることで、
+# ソースコードが変更された場合でもキャッシュを活用可能
+COPY package*.json ./
+
+# prismaディレクトリをコピー（スキーマファイルを含む）
+COPY prisma ./prisma/
+
+# 依存関係をインストール
+# 開発環境では全ての依存関係（devDependencies含む）をインストール
+RUN npm install
+
+# Prismaクライアントを生成
+# データベーススキーマに基づいて型安全なクライアントを生成
+RUN npx prisma generate
+
+# アプリケーションのソースコードをコピー
+# .dockerignoreで指定したファイル以外のすべてをコピー
+COPY . .
+
+# アプリケーションで使用するポートを公開
+EXPOSE 3001
+# 開発環境でのPrisma Studio用ポートを公開
+EXPOSE 5555
+
+# 開発サーバーを起動
+# npm run devコマンドでnodemonを使用したホットリロード開発サーバーが起動
+CMD ["npm", "run", "dev"]
